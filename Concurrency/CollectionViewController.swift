@@ -63,6 +63,7 @@ extension CollectionViewController {
     cell.display(image: nil)
     //downloadWithGlobalQueue(at: indexPath)
     downloadWithUrlSession(at: indexPath)
+    //downloadWithWorkItem(at: indexPath)
     return cell
   }
   
@@ -96,6 +97,33 @@ extension CollectionViewController {
   
     }.resume()
   }
+  
+  private func downloadWithWorkItem(at indexPath: IndexPath) {
+    
+    let queue = DispatchQueue(label: "com.ZlobinSergey.WorkItem",
+                              qos: .utility,
+                              attributes: .concurrent)
+    
+    let backGroundQueue = DispatchWorkItem { [weak self] in
+      
+      guard let self = self else {return}
+      
+      let url = self.urls[indexPath.item]
+      
+      guard let data = try? Data(contentsOf: url), let image = UIImage(data: data) else { return }
+      
+      DispatchQueue.main.async {
+        if let cell = self.collectionView.cellForItem(at: indexPath) as? PhotoCell {
+          cell.display(image: image)
+        }
+      }
+      
+    }
+    
+    queue.async(execute: backGroundQueue)
+    
+  }
+  
 }
 
 // MARK: - UICollectionViewDelegateFlowLayout
