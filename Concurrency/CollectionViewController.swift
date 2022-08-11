@@ -93,10 +93,9 @@ extension CollectionViewController {
           cell.display(image: image)
         }
       }
-      
+  
     }.resume()
   }
-  
 }
 
 // MARK: - UICollectionViewDelegateFlowLayout
